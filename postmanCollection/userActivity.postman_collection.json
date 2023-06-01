@@ -23,6 +23,72 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "userActivitiesMonthly",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:1324/userActivities?rankingType=monthly&month=3&year=2023",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "1324",
+					"path": [
+						"userActivities"
+					],
+					"query": [
+						{
+							"key": "rankingType",
+							"value": "monthly"
+						},
+						{
+							"key": "month",
+							"value": "3"
+						},
+						{
+							"key": "year",
+							"value": "2023"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "userActivitiesWeekly",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:1324/userActivities?rankingType=weekly&week=52&year=2023",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "1324",
+					"path": [
+						"userActivities"
+					],
+					"query": [
+						{
+							"key": "rankingType",
+							"value": "weekly"
+						},
+						{
+							"key": "week",
+							"value": "52"
+						},
+						{
+							"key": "year",
+							"value": "2023"
+						}
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }
