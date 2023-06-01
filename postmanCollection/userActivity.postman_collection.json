@@ -1,0 +1,28 @@
+{
+	"info": {
+		"_postman_id": "56ffb640-3dcf-4329-97c7-80b7a5573524",
+		"name": "userActivity",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "userActivities",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:1324/userActivities",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "1324",
+					"path": [
+						"userActivities"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
