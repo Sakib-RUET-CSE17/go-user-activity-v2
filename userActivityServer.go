@@ -49,7 +49,7 @@ func hello(c echo.Context) error {
 	return c.String(http.StatusOK, "Hello, World!")
 }
 
-type User struct {
+type UserActivity struct {
 	ID             uint   `json:"id"`
 	FirstName      string `json:"name"`
 	Country        string `json:"country"`
@@ -68,7 +68,7 @@ func getUserActivities(c echo.Context) error {
 	yearStr := c.QueryParam("year")
 	year, _ := strconv.Atoi(yearStr)
 
-	var users []User
+	var userActivities []UserActivity
 
 	if rankingTypeStr == "weekly" {
 		query := `select
@@ -93,7 +93,7 @@ func getUserActivities(c echo.Context) error {
 		year
 	  having
 		week = ? && year = ?`
-		resp := db.Raw(query, week, year).Find(&users)
+		resp := db.Raw(query, week, year).Find(&userActivities)
 		if resp.Error != nil {
 			return c.JSON(http.StatusNotFound, "not found")
 		}
@@ -120,7 +120,7 @@ func getUserActivities(c echo.Context) error {
 		year
 	  having
 		month = ? && year = ?`
-		resp := db.Raw(query, month, year).Find(&users)
+		resp := db.Raw(query, month, year).Find(&userActivities)
 		if resp.Error != nil {
 			return c.JSON(http.StatusNotFound, "not found")
 		}
@@ -141,11 +141,11 @@ func getUserActivities(c echo.Context) error {
 		join activities on activity_logs.activity_id = activities.id
 	  group by
 		users.id`
-		resp := db.Raw(query).Find(&users)
+		resp := db.Raw(query).Find(&userActivities)
 		if resp.Error != nil {
 			return c.JSON(http.StatusNotFound, "not found")
 		}
 	}
 
-	return c.JSON(http.StatusOK, users)
+	return c.JSON(http.StatusOK, userActivities)
 }
