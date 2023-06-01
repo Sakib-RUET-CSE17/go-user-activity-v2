@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	echo "github.com/labstack/echo/v4"
 	"gorm.io/driver/mysql"
@@ -59,28 +60,92 @@ type User struct {
 }
 
 func getUserActivities(c echo.Context) error {
-	// idStr := c.QueryParam("id")
-	// id, _ := strconv.Atoi(idStr)
+	rankingTypeStr := c.QueryParam("rankingType")
+	weekStr := c.QueryParam("week")
+	week, _ := strconv.Atoi(weekStr)
+	monthStr := c.QueryParam("month")
+	month, _ := strconv.Atoi(monthStr)
+	yearStr := c.QueryParam("year")
+	year, _ := strconv.Atoi(yearStr)
 
 	var users []User
-	resp := db.Raw(`select
-	users.id,
-	first_name,
-	country,
-	profile_picture,
-	sum(points) as total_point,
-	dense_rank() over (
-	  order by
-		sum(points) desc
-	) as ranking
-  from
-	users
-	join activity_logs on users.id = activity_logs.user_id
-	join activities on activity_logs.activity_id = activities.id
-  group by
-	users.id`).Find(&users)
-	if resp.Error != nil {
-		return c.JSON(http.StatusNotFound, "not found")
+
+	if rankingTypeStr == "weekly" {
+		query := `select
+		users.id,
+		first_name,
+		country,
+		profile_picture,
+		week(logged_at) as week,
+		year(logged_at) as year,
+		sum(points) as total_point,
+		dense_rank() over (
+		  order by
+			sum(points) desc
+		) as ranking
+	  from
+		users
+		join activity_logs on users.id = activity_logs.user_id
+		join activities on activity_logs.activity_id = activities.id
+	  group by
+		users.id,
+		week,
+		year
+	  having
+		week = ? && year = ?`
+		resp := db.Raw(query, week, year).Find(&users)
+		if resp.Error != nil {
+			return c.JSON(http.StatusNotFound, "not found")
+		}
+	} else if rankingTypeStr == "monthly" {
+		query := `select
+		users.id,
+		first_name,
+		country,
+		profile_picture,
+		month(logged_at) as month,
+		year(logged_at) as year,
+		sum(points) as total_point,
+		dense_rank() over (
+		  order by
+			sum(points) desc
+		) as ranking
+	  from
+		users
+		join activity_logs on users.id = activity_logs.user_id
+		join activities on activity_logs.activity_id = activities.id
+	  group by
+		users.id,
+		month,
+		year
+	  having
+		month = ? && year = ?`
+		resp := db.Raw(query, month, year).Find(&users)
+		if resp.Error != nil {
+			return c.JSON(http.StatusNotFound, "not found")
+		}
+	} else {
+		query := `select
+		users.id,
+		first_name,
+		country,
+		profile_picture,
+		sum(points) as total_point,
+		dense_rank() over (
+		  order by
+			sum(points) desc
+		) as ranking
+	  from
+		users
+		join activity_logs on users.id = activity_logs.user_id
+		join activities on activity_logs.activity_id = activities.id
+	  group by
+		users.id`
+		resp := db.Raw(query).Find(&users)
+		if resp.Error != nil {
+			return c.JSON(http.StatusNotFound, "not found")
+		}
 	}
+
 	return c.JSON(http.StatusOK, users)
 }
