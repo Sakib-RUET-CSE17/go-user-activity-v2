@@ -36,7 +36,7 @@ func main() {
 	e := echo.New()
 	fmt.Println(db)
 	e.GET("/hello", hello)
-	e.GET("/userActivities", getStudent)
+	e.GET("/userActivities", getUserActivities)
 
 	err := e.Start(":1324")
 	if err != nil {
@@ -58,7 +58,7 @@ type User struct {
 	// UserActivities []UserActivity `json:"userActivities"`
 }
 
-func getStudent(c echo.Context) error {
+func getUserActivities(c echo.Context) error {
 	// idStr := c.QueryParam("id")
 	// id, _ := strconv.Atoi(idStr)
 
@@ -80,7 +80,7 @@ func getStudent(c echo.Context) error {
   group by
 	users.id`).Find(&users)
 	if resp.Error != nil {
-		return c.JSON(http.StatusNotFound, "student not found")
+		return c.JSON(http.StatusNotFound, "not found")
 	}
 	return c.JSON(http.StatusOK, users)
 }
