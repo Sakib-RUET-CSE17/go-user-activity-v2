@@ -38,6 +38,9 @@ func main() {
 	fmt.Println(db)
 	e.GET("/hello", hello)
 	e.GET("/userActivities", getUserActivities)
+	e.POST("/users", createUser)
+	// e.PATCH("/users/:id", updateUser)
+	// e.DELETE("/users/:id", deleteUser)
 
 	err := e.Start(":1324")
 	if err != nil {
@@ -148,4 +151,23 @@ func getUserActivities(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, userActivities)
+}
+
+type User struct {
+	ID             uint   `json:"id"`
+	FirstName      string `json:"firstName"`
+	LastName       string `json:"lastName"`
+	Country        string `json:"country"`
+	ProfilePicture string `json:"profilePicture"`
+}
+
+func createUser(c echo.Context) error {
+	user := &User{}
+	if err := c.Bind(user); err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+	if err := db.Create(&user).Error; err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusCreated, user)
 }
