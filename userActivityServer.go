@@ -40,7 +40,7 @@ func main() {
 	e.GET("/userActivities", getUserActivities)
 	e.POST("/users", createUser)
 	// e.PATCH("/users/:id", updateUser)
-	// e.DELETE("/users/:id", deleteUser)
+	e.DELETE("/users/:id", deleteUser)
 
 	err := e.Start(":1324")
 	if err != nil {
@@ -170,4 +170,20 @@ func createUser(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 	return c.JSON(http.StatusCreated, user)
+}
+
+func deleteUser(c echo.Context) error {
+	var user User
+	id := c.Param("id")
+
+	ID, err := strconv.ParseInt(id, 0, 0)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	if err := db.Where("id = ?", ID).Delete(&user).Error; err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, "User deleted successfully")
 }
