@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 
 	echo "github.com/labstack/echo/v4"
 	"gorm.io/driver/mysql"
@@ -15,13 +16,6 @@ import (
 // 	UserActivities []UserActivity
 // 	Name           string
 // 	Point          uint
-// }
-
-// type UserActivity struct {
-// 	ID         uint
-// 	UserId     uint
-// 	ActivityID uint
-// 	CreatedAt  time.Time
 // }
 
 var db *gorm.DB
@@ -172,6 +166,13 @@ func createUser(c echo.Context) error {
 	return c.JSON(http.StatusCreated, user)
 }
 
+type ActivityLog struct {
+	ID         uint
+	UserId     uint
+	ActivityID uint
+	LoggedAt   time.Time
+}
+
 func deleteUser(c echo.Context) error {
 	var user User
 	id := c.Param("id")
@@ -182,6 +183,11 @@ func deleteUser(c echo.Context) error {
 	}
 
 	if err := db.Where("id = ?", ID).Delete(&user).Error; err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	// also delete necessary entries of Activity Logs of user
+	var activityLog ActivityLog
+	if err := db.Where("user_id = ?", ID).Delete(&activityLog).Error; err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
